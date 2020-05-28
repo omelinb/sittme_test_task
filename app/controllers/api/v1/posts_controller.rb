@@ -1,10 +1,12 @@
 class Api::V1::PostsController < ApplicationController
-  before_action :page_params, only: [:index]
+  include Paginable
   before_action :post_params, only: [:create]
 
   # GET /api/v1/posts
   def index
-    render json: PostSerializer.new(Post.page(@limit, @cursor)).serializable_hash
+    posts = Post.page(page, per_page)
+    options = pagination_links('api_v1_posts_path', Post)
+    render json: PostSerializer.new(posts, options).serializable_hash
   end
 
   # POST /api/v1/posts
@@ -19,13 +21,7 @@ class Api::V1::PostsController < ApplicationController
 
   private
 
-  def page_params
-    @limit = (params[:limit] || 10).to_i
-    @cursor = (params[:cursor] || 0).to_i
-  end
-
   def post_params
-    # binding.pry
     params.require(:post).permit(:title, :text)
   end
 end

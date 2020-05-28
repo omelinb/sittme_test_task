@@ -1,5 +1,3 @@
 class Post < ApplicationRecord
-  scope :page, -> (limit, cursor) {
-    order(:created_at).where('id > ?', cursor).limit(limit)
-  }
+  scope :page, -> (page, per_page) { offset(page * per_page).limit(per_page) }
 end
