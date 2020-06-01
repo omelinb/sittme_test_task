@@ -1,11 +1,12 @@
 class Api::V1::PostsController < ApplicationController
-  include Paginable
+  include Paginable::Controller
+
   before_action :post_params, only: [:create]
 
   # GET /api/v1/posts
   def index
-    posts = Post.page(page, per_page)
-    options = pagination_links('api_v1_posts_path', Post)
+    posts = Post.get_page(page_before, page_after, page_size)
+    options = pagination_links('api_v1_posts_path', posts)
     render json: PostSerializer.new(posts, options).serializable_hash
   end
 
@@ -25,4 +26,3 @@ class Api::V1::PostsController < ApplicationController
     params.require(:post).permit(:title, :text)
   end
 end
-
